@@ -1,16 +1,21 @@
 %global opt %(test -x %{_bindir}/ocamlopt && echo 1 || echo 0)
-%global debug_package %{nil}
 
 Name:           ocaml-gettext
-Version:        0.3.4
-Release:        9%{?dist}
+Version:        0.3.7
+Release:        1%{?dist}
 Summary:        OCaml library for i18n
 
 License:        LGPLv2+ with exceptions
-URL:            http://forge.ocamlcore.org/projects/ocaml-gettext
-ExcludeArch:    sparc64 s390 s390x
+URL:            https://github.com/gildor478/ocaml-gettext
 
-Source0:        http://forge.ocamlcore.org/frs/download.php/676/ocaml-gettext-%{version}.tar.gz
+ExcludeArch:    s390
+
+Source0:        https://github.com/gildor478/%{name}/archive/%{version}.tar.gz
+
+Patch0:         ocaml-gettext-0.3.4-use-ocamlopt-g.patch
+Patch0001:      0001-pr_gettext-stop-tracking-and-printing-untranslated-s.patch
+Patch0002:      0002-pr_gettext-stop-printing-extracted-strings.patch
+Patch0003:      0003-add-more-generated-files-to-.gitignore.patch
 
 BuildRequires:  ocaml >= 4.00.1
 BuildRequires:  ocaml-findlib-devel >= 1.3.3-3
@@ -27,6 +32,7 @@ BuildRequires:  ocaml-ounit-devel
 BuildRequires:  ocaml-camomile-devel >= 0.8.1
 BuildRequires:  ocaml-camomile-data
 %endif
+BuildRequires:  autoconf, automake
 
 %if !0%{?rhel}
 # ocaml-gettext program needs camomile data files
@@ -76,6 +82,7 @@ depend on Camomile.
 %package        camomile-devel
 Summary:        Development files for %{name}-camomile
 Requires:       %{name}-devel = %{version}-%{release}
+Requires:       %{name}-camomile = %{version}-%{release}
 
 
 %description    camomile-devel
@@ -87,9 +94,14 @@ signature files for developing applications that use
 
 %prep
 %setup -q
+%autopatch -p1
+
+autoreconf -i
 
 
 %build
+# Parallel builds don't work.
+unset MAKEFLAGS
 CFLAGS="$RPM_OPT_FLAGS" \
 ./configure \
   --libdir=%{_libdir} \
@@ -103,10 +115,12 @@ make all
 
 
 %check
+%if %opt
 %if !0%{?rhel}
 pushd test
 ../_build/bin/test
 popd
+%endif
 %endif
 
 
@@ -129,9 +143,7 @@ ocamlfind install gettext-camomile _build/lib/gettext-camomile/*
 install -m 0755 _build/bin/ocaml-gettext $RPM_BUILD_ROOT%{_bindir}/
 install -m 0755 _build/bin/ocaml-xgettext $RPM_BUILD_ROOT%{_bindir}/
 
-strip $OCAMLFIND_DESTDIR/stublibs/dll*.so
 chrpath --delete $OCAMLFIND_DESTDIR/stublibs/dll*.so
-strip $RPM_BUILD_ROOT%{_bindir}/ocaml-gettext
 
 
 %files
@@ -195,6 +207,26 @@ strip $RPM_BUILD_ROOT%{_bindir}/ocaml-gettext
 
 
 %changelog
+* Sat Sep 23 2017 Richard W.M. Jones <rjones@redhat.com> - 0.3.7-1
+- Update to new upstream version 0.3.7.
+- New URL.
+- Include upstream patches since 0.3.7 was released.
+- Rebuild for OCaml 4.05.0
+- ExcludeArch s390, but build for s390x.
+  resolves: rhbz#1447987
+
+* Fri Sep 19 2014 Richard W.M. Jones <rjones@redhat.com> - 0.3.4-13
+- Bump release and rebuild.
+
+* Thu Sep 11 2014 Richard W.M. Jones <rjones@redhat.com> - 0.3.4-12
+- Bump release and rebuild.
+
+* Fri Aug 08 2014 Richard W.M. Jones <rjones@redhat.com> - 0.3.4-11
+- Resolves: rhbz#1125628
+
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 0.3.4-10
+- Mass rebuild 2013-12-27
+
 * Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.3.4-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
