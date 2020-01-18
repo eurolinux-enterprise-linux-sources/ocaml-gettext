@@ -3,7 +3,7 @@
 
 Name:           ocaml-gettext
 Version:        0.3.4
-Release:        13%{?dist}
+Release:        9%{?dist}
 Summary:        OCaml library for i18n
 
 License:        LGPLv2+ with exceptions
@@ -195,18 +195,6 @@ strip $RPM_BUILD_ROOT%{_bindir}/ocaml-gettext
 
 
 %changelog
-* Fri Sep 19 2014 Richard W.M. Jones <rjones@redhat.com> - 0.3.4-13
-- Bump release and rebuild.
-
-* Thu Sep 11 2014 Richard W.M. Jones <rjones@redhat.com> - 0.3.4-12
-- Bump release and rebuild.
-
-* Fri Aug 08 2014 Richard W.M. Jones <rjones@redhat.com> - 0.3.4-11
-- Resolves: rhbz#1125628
-
-* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 0.3.4-10
-- Mass rebuild 2013-12-27
-
 * Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.3.4-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
